@@ -1,28 +1,40 @@
 package com.example.fitnessmeal.FitnessMealService.Model;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-
+import java.time.LocalDate;
 import java.util.List;
 
 @Document(collection = "mealplans")
 @Data
-@Getter
-@Setter
 public class MealPlan {
-
     @Id
     private String id;
     private String userId;
-    private List<String> meals;
+    private LocalDate date;
+    private List<Meal> meals;
+    private double totalCalories;
+    private double totalProtein;
+    private double totalCarbs;
+    private double totalFat;
 
-    public MealPlan() {}
+    @Data
+    public static class Meal {
+        private String name;
+        private MealType type;
+        private List<String> ingredients;
+        private double calories;
+        private double protein;
+        private double carbs;
+        private double fat;
+        private String recipe;
+    }
 
-    public MealPlan(String userId, List<String> meals) {
-        this.userId = userId;
-        this.meals = meals;
+    public enum MealType {
+        BREAKFAST,
+        LUNCH,
+        DINNER,
+        SNACK
     }
 }

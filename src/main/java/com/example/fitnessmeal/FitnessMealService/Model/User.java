@@ -1,35 +1,41 @@
 package com.example.fitnessmeal.FitnessMealService.Model;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "users")
 @Data
-@Getter
-@Setter
 public class User {
-
     @Id
     private String id;
     private String name;
     private DietPreference preferredDiet;
+    private int age;
+    private double weight;
+    private double height;
+    private ActivityLevel activityLevel;
+    private FitnessGoal fitnessGoal;
 
     public enum DietPreference {
-        Veg,
-        NonVeg
+        CALORIE_DEFICIT,
+        MUSCLE_GAIN,
+        STRENGTH,
+        MAINTENANCE
     }
 
-    public User() {
+    public enum ActivityLevel {
+        SEDENTARY,
+        LIGHTLY_ACTIVE,
+        MODERATELY_ACTIVE,
+        VERY_ACTIVE,
+        EXTREMELY_ACTIVE
     }
 
-    public User(String id, String name, DietPreference preferredDiet) {
-        this.id = id;
-        this.name = name;
-        this.preferredDiet = preferredDiet;
+    public enum FitnessGoal {
+        WEIGHT_LOSS,
+        MUSCLE_GAIN,
+        MAINTENANCE,
+        GENERAL_FITNESS
     }
-
 }
-
