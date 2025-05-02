@@ -40,7 +40,6 @@ public class MealPlanService {
         return mealPlanRepository.save(mealPlan);
     }
 
-    // Add the missing method
     public List<MealPlan> getMealPlansByDateRange(String userId, LocalDate startDate, LocalDate endDate) {
         // First verify if user exists
         userRepository.findById(userId)
@@ -55,7 +54,6 @@ public class MealPlanService {
         return mealPlanRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
     }
 
-    // Add method to delete meal plan
     public void deleteMealPlan(String userId, LocalDate date) {
         // Verify if user exists
         userRepository.findById(userId)
