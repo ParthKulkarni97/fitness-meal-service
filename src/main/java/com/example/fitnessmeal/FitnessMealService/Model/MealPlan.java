@@ -3,7 +3,7 @@ package com.example.fitnessmeal.FitnessMealService.Model;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.time.LocalDate;
+
 import java.util.List;
 
 @Document(collection = "mealplans")
@@ -12,7 +12,6 @@ public class MealPlan {
     @Id
     private String id;
     private String userId;
-    private LocalDate date;
     private List<Meal> meals;
     private double totalCalories;
     private double totalProtein;

@@ -24,28 +24,22 @@ public class MealPlanController {
     }
 
     @PostMapping("/{userId}")
-    public ResponseEntity<MealPlan> generateMealPlan(
-            @PathVariable String userId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        log.info("Generating meal plan for user: {} for date: {}", userId, date);
-        MealPlan mealPlan = mealPlanService.generateMealPlan(userId, date);
-        return ResponseEntity.ok(mealPlan);
+    public MealPlan generateMealPlan(
+            @PathVariable String userId) {
+        log.info("Generating meal plan for user: {}", userId);
+        return mealPlanService.generateMealPlan(userId);
     }
 
     @GetMapping("/{userId}")
-    public ResponseEntity<List<MealPlan>> getUserMealPlans(
-            @PathVariable String userId,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        List<MealPlan> mealPlans = mealPlanService.getMealPlansByDateRange(userId, startDate, endDate);
-        return ResponseEntity.ok(mealPlans);
+    public MealPlan.Meal getUserMealPlans(
+            @PathVariable String userId) {
+        return mealPlanService.getMealPlans(userId);
     }
 
-    @DeleteMapping("/{userId}/{date}")
+    @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteMealPlan(
-            @PathVariable String userId,
-            @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        mealPlanService.deleteMealPlan(userId, date);
+            @PathVariable String userId) {
+        mealPlanService.deleteMealPlan(userId);
         return ResponseEntity.noContent().build();
     }
 }

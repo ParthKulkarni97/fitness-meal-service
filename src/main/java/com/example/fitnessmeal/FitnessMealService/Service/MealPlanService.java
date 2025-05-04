@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,39 +26,34 @@ public class MealPlanService {
         this.mealPlanRepository = mealPlanRepository;
     }
 
-    public MealPlan generateMealPlan(String userId, LocalDate date) {
+    public MealPlan generateMealPlan(String userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
 
         MealPlan mealPlan = new MealPlan();
         mealPlan.setUserId(userId);
-        mealPlan.setDate(date);
         mealPlan.setMeals(generateMealsBasedOnPreferences(user));
         calculateNutrition(mealPlan);
 
         return mealPlanRepository.save(mealPlan);
     }
 
-    public List<MealPlan> getMealPlansByDateRange(String userId, LocalDate startDate, LocalDate endDate) {
+    public MealPlan.Meal getMealPlans(String userId) {
+        checkUser(userId);
+        // Get meal plans for the user
+        return mealPlanRepository.findMealPlanByUserId(userId);
+    }
+
+    private void checkUser(String userId) {
         // First verify if user exists
         userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
-        // Validate dates
-        if (startDate.isAfter(endDate)) {
-            throw new IllegalArgumentException("Start date must be before or equal to end date");
-        }
-
-        // Get meal plans for the date range
-        return mealPlanRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
     }
 
-    public void deleteMealPlan(String userId, LocalDate date) {
+    public void deleteMealPlan(String userId) {
         // Verify if user exists
-        userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
-        mealPlanRepository.deleteByUserIdAndDate(userId, date);
+        checkUser(userId);
+        mealPlanRepository.deleteByUserId(userId);
     }
 
     private List<MealPlan.Meal> generateMealsBasedOnPreferences(User user) {
