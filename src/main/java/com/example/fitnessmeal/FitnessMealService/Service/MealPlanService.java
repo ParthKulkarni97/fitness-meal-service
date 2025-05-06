@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -33,69 +34,79 @@ public class MealPlanService {
         MealPlan mealPlan = new MealPlan();
         mealPlan.setUserId(userId);
         mealPlan.setMeals(generateMealsBasedOnPreferences(user));
-        calculateNutrition(mealPlan);
 
         return mealPlanRepository.save(mealPlan);
     }
 
-    public MealPlan.Meal getMealPlans(String userId) {
-        checkUser(userId);
-        // Get meal plans for the user
-        return mealPlanRepository.findMealPlanByUserId(userId);
+    public List<MealPlan> getMealPlans(String userId) {
+        return mealPlanRepository.findByUserId(userId);
     }
 
-    private void checkUser(String userId) {
-        // First verify if user exists
-        userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-    }
+    public void deleteMealPlan(String userId, String mealPlanId) {
+        MealPlan mealPlan = mealPlanRepository.findById(mealPlanId)
+                .orElseThrow(() -> new RuntimeException("Meal plan not found"));
 
-    public void deleteMealPlan(String userId) {
-        // Verify if user exists
-        checkUser(userId);
-        mealPlanRepository.deleteByUserId(userId);
+        if (!mealPlan.getUserId().equals(userId)) {
+            throw new RuntimeException("Unauthorized access to meal plan");
+        }
+
+        mealPlanRepository.deleteById(mealPlanId);
     }
 
     private List<MealPlan.Meal> generateMealsBasedOnPreferences(User user) {
         List<MealPlan.Meal> meals = new ArrayList<>();
 
         switch (user.getPreferredDiet()) {
-            case CALORIE_DEFICIT:
-                generateLowCalorieMeals(meals);
-                break;
-            case MUSCLE_GAIN:
-                generateHighProteinMeals(meals);
-                break;
-            case STRENGTH:
-                generateBalancedMeals(meals);
-                break;
-            default:
-                generateDefaultMeals(meals);
+            case MUSCLE_GAIN -> generateHighProteinMeals(meals);
+            case CALORIE_DEFICIT -> generateLowCalorieMeals(meals);
+            case STRENGTH -> generateBalancedMeals(meals);
+            default -> generateDefaultMeals(meals);
         }
 
         return meals;
     }
 
-    private void calculateNutrition(MealPlan mealPlan) {
-        double totalCalories = 0;
-        double totalProtein = 0;
-        double totalCarbs = 0;
-        double totalFat = 0;
+    private void generateHighProteinMeals(List<MealPlan.Meal> meals) {
+        MealPlan.Meal breakfast = new MealPlan.Meal();
+        breakfast.setName("Protein Pancakes");
+        breakfast.setType(MealPlan.MealType.BREAKFAST);
+        breakfast.setCalories(450);
+        breakfast.setProtein(35);
+        breakfast.setCarbs(40);
+        breakfast.setFat(15);
+        breakfast.setIngredients(Arrays.asList("Protein Powder", "Eggs", "Oats", "Greek Yogurt"));
+        breakfast.setRecipe("1. Mix ingredients\n2. Cook on griddle");
+        meals.add(breakfast);
 
-        for (MealPlan.Meal meal : mealPlan.getMeals()) {
-            totalCalories += meal.getCalories();
-            totalProtein += meal.getProtein();
-            totalCarbs += meal.getCarbs();
-            totalFat += meal.getFat();
-        }
+        // Add more meals similarly
+        // Add lunch
+        MealPlan.Meal lunch = new MealPlan.Meal();
+        lunch.setName("Chicken Rice Bowl");
+        lunch.setType(MealPlan.MealType.LUNCH);
+        lunch.setCalories(600);
+        lunch.setProtein(45);
+        lunch.setCarbs(65);
+        lunch.setFat(20);
+        lunch.setIngredients(Arrays.asList("Chicken Breast", "Brown Rice", "Broccoli", "Olive Oil"));
+        lunch.setRecipe("1. Cook rice\n2. Grill chicken\n3. Steam broccoli\n4. Combine all ingredients");
+        meals.add(lunch);
 
-        mealPlan.setTotalCalories(totalCalories);
-        mealPlan.setTotalProtein(totalProtein);
-        mealPlan.setTotalCarbs(totalCarbs);
-        mealPlan.setTotalFat(totalFat);
+        // Add dinner
+        MealPlan.Meal dinner = new MealPlan.Meal();
+        dinner.setName("Salmon with Sweet Potato");
+        dinner.setType(MealPlan.MealType.DINNER);
+        dinner.setCalories(550);
+        dinner.setProtein(40);
+        dinner.setCarbs(45);
+        dinner.setFat(25);
+        dinner.setIngredients(Arrays.asList("Salmon Fillet", "Sweet Potato", "Asparagus", "Butter"));
+        dinner.setRecipe("1. Bake salmon\n2. Roast sweet potato\n3. Grill asparagus");
+        meals.add(dinner);
     }
 
+    // Implement other meal generation methods similarly
     private void generateLowCalorieMeals(List<MealPlan.Meal> meals) {
+        // Implementation for low calorie meals
         MealPlan.Meal breakfast = new MealPlan.Meal();
         breakfast.setName("Oatmeal with Berries");
         breakfast.setType(MealPlan.MealType.BREAKFAST);
@@ -119,21 +130,6 @@ public class MealPlanService {
         meals.add(breakfast);
         meals.add(lunch);
         // Add more meals as needed
-    }
-
-    private void generateHighProteinMeals(List<MealPlan.Meal> meals) {
-        MealPlan.Meal breakfast = new MealPlan.Meal();
-        breakfast.setName("Protein Pancakes");
-        breakfast.setType(MealPlan.MealType.BREAKFAST);
-        breakfast.setCalories(450);
-        breakfast.setProtein(35);
-        breakfast.setCarbs(40);
-        breakfast.setFat(15);
-        breakfast.setIngredients(List.of("Protein Powder", "Eggs", "Oats", "Greek Yogurt"));
-        breakfast.setRecipe("1. Mix ingredients\n2. Cook on griddle");
-
-        meals.add(breakfast);
-        // Add more high-protein meals
     }
 
     private void generateBalancedMeals(List<MealPlan.Meal> meals) {

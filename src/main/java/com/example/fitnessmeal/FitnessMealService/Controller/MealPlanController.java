@@ -4,11 +4,9 @@ import com.example.fitnessmeal.FitnessMealService.Model.MealPlan;
 import com.example.fitnessmeal.FitnessMealService.Service.MealPlanService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -24,22 +22,23 @@ public class MealPlanController {
     }
 
     @PostMapping("/{userId}")
-    public MealPlan generateMealPlan(
-            @PathVariable String userId) {
+    public ResponseEntity<MealPlan> generateMealPlan(@PathVariable String userId) {
         log.info("Generating meal plan for user: {}", userId);
-        return mealPlanService.generateMealPlan(userId);
+        MealPlan mealPlan = mealPlanService.generateMealPlan(userId);
+        return ResponseEntity.ok(mealPlan);
     }
 
     @GetMapping("/{userId}")
-    public MealPlan.Meal getUserMealPlans(
-            @PathVariable String userId) {
-        return mealPlanService.getMealPlans(userId);
+    public ResponseEntity<List<MealPlan>> getUserMealPlans(@PathVariable String userId) {
+        List<MealPlan> mealPlans = mealPlanService.getMealPlans(userId);
+        return ResponseEntity.ok(mealPlans);
     }
 
-    @DeleteMapping("/{userId}")
+    @DeleteMapping("/{userId}/{mealPlanId}")
     public ResponseEntity<Void> deleteMealPlan(
-            @PathVariable String userId) {
-        mealPlanService.deleteMealPlan(userId);
+            @PathVariable String userId,
+            @PathVariable String mealPlanId) {
+        mealPlanService.deleteMealPlan(userId, mealPlanId);
         return ResponseEntity.noContent().build();
     }
 }
